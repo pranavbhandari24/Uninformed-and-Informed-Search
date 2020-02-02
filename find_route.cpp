@@ -31,11 +31,10 @@ void read_file(std::string input_file) {
 
 void uninformed_search(std::string input_file, std::string origin_city, std::string destination_city) {
     read_file(input_file);
-
 }
 
 void informed_search(std::string input_file, std::string origin_city, std::string destination_city, std::string heuristic_file) {
-    
+    read_file(input_file);
 }
 
 int main(int argc, char* argv[]) {
