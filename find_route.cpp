@@ -15,7 +15,8 @@ std::vector<std::string> tokenize(std::string text) {
     return result;
 }
 
-void read_file(std::string input_file) {
+std::map<std::string, std::map<std::string, int>> read_file(std::string input_file) {
+    std::map<std::string, std::map<std::string, int>> data;
     std::fstream file(input_file);
     std::string text;
     while(getline(file, text)) {
@@ -23,18 +24,38 @@ void read_file(std::string input_file) {
             break;
         else{
             std::vector<std::string> line = tokenize(text);
-            std::cout<<line[0]<<line[1]<<line[2]<<std::endl;
+            int cost = std::stoi(line[2]);
+            auto start = data.find(line[0]);
+            auto end   = data.find(line[1]);
+            if(start == data.end()) {
+                std::map<std::string, int> temp;
+                temp[line[1]] = cost;
+                data.insert( std::pair<std::string, std::map<std::string, int>>(line[0], temp) );
+            }
+            else {
+                (data.find(line[0])->second).insert(std::pair<std::string, int>(line[1], cost));
+            }
+
+            if(end == data.end()) {
+                std::map<std::string, int> temp;
+                temp[line[0]] = cost;
+                data.insert( std::pair<std::string, std::map<std::string, int>>(line[1], temp) );
+            }
+            else {
+                (data.find(line[1])->second).insert(std::pair<std::string, int>(line[0], cost));
+            }
         }
     }
     file.close();
+    return data;
 }
 
 void uninformed_search(std::string input_file, std::string origin_city, std::string destination_city) {
-    read_file(input_file);
+    std::map<std::string, std::map<std::string, int>> data = read_file(input_file);
 }
 
 void informed_search(std::string input_file, std::string origin_city, std::string destination_city, std::string heuristic_file) {
-    read_file(input_file);
+    std::map<std::string, std::map<std::string, int>> data =  read_file(input_file);
 }
 
 int main(int argc, char* argv[]) {
