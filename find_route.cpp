@@ -16,7 +16,6 @@ std::vector<std::string> tokenize(std::string text) {
 }
 
 void read_file(std::string input_file) {
-    
     std::fstream file(input_file);
     std::string text;
     while(getline(file, text)) {
