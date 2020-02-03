@@ -16,6 +16,7 @@ class Node {
     int cumulative_cost;
 };
 
+
 std::vector<std::string> tokenize(std::string text) {
     char* token = strtok(const_cast<char*>(text.c_str()), " ");
     std::vector<std::string> result;
