@@ -6,6 +6,7 @@
 #include <deque>
 #include <algorithm>
 
+//Used class, as I might need extra functionality
 class Node {
     public:
     std::vector<std::string> route;
@@ -59,6 +60,19 @@ std::map<std::string, std::map<std::string, int>> read_file(std::string input_fi
     }
     file.close();
     return data;
+}
+
+std::map<std::string, int> heuristic_read_file(std::string heuristic_file) {
+    std::fstream file(heuristic_file);
+    std::string text;
+    std::map<std::string, int> result;
+    while(getline(file,text)) {
+        if(text == "END OF INPUT") 
+            break;
+        std::vector<std::string> words = tokenize(text);
+        result[words[0]] = std::stoi(words[1]);
+    }
+    return result;
 }
 
 void uninformed_search(std::string input_file, std::string origin_city, std::string destination_city) {
@@ -140,6 +154,7 @@ void uninformed_search(std::string input_file, std::string origin_city, std::str
 
 void informed_search(std::string input_file, std::string origin_city, std::string destination_city, std::string heuristic_file) {
     std::map<std::string, std::map<std::string, int>> data =  read_file(input_file);
+    std::map<std::string, int> heuristic_data = heuristic_read_file(heuristic_file);
 }
 
 int main(int argc, char* argv[]) {
