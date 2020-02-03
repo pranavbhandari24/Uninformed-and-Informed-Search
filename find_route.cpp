@@ -62,18 +62,23 @@ std::map<std::string, std::map<std::string, int>> read_file(std::string input_fi
 }
 
 void uninformed_search(std::string input_file, std::string origin_city, std::string destination_city) {
+    // Uniform Cost Search is implemented using BFS
+    // The algorithm starts at the origin city and searches breadth first, 
+    // Already expanded nodes are deleted, to avoid loops
+    // Fringe is sorted after each expansion to guarantee optimal solution.
     std::map<std::string, std::map<std::string, int>> data = read_file(input_file);
     std::deque<Node> fringe;
 
+    //Creating the start node
     Node temp;
     temp.city_name = origin_city;
-    //temp.parent_city = "\0";
     std::vector<std::string> r;
     std::vector<int> c;
     temp.route = r;
     temp.costs = c;
     temp.depth = 0;
     temp.cumulative_cost = 0;
+    //Adding the start node to the fringe
     fringe.push_back(temp);
 
     // Variables needed
@@ -85,7 +90,8 @@ void uninformed_search(std::string input_file, std::string origin_city, std::str
         
         Node current_node = fringe[0];
         fringe.pop_front();
-        //std::cout<<"Current City = "<<current_node.city_name<<std::endl;
+        
+        // If the destination is found, print required details
         if(current_node.city_name == destination_city) {
             std::cout<<"\nNodes Expanded  = "<<nodes_expanded;
             std::cout<<"\nNodes Generated = "<<nodes_generated;
@@ -100,9 +106,11 @@ void uninformed_search(std::string input_file, std::string origin_city, std::str
             return;
         }
 
+        // Find the node in the data read from the file, and expand the node
         auto it = data.find(current_node.city_name);
         if(it!=data.end()) {
             nodes_expanded++;
+            //Loop over all the adjacent cities and add them to fringe
             for(auto t: it->second) {
                 nodes_generated++;
                 temp.city_name = t.first;               //temp is already initialized before as a struct node, I am just using the variable again.
@@ -116,8 +124,8 @@ void uninformed_search(std::string input_file, std::string origin_city, std::str
                 temp.depth = current_node.depth + 1;
                 fringe.push_back(temp);
             }
-            data.erase(it);     //may delete later
-            std::sort(fringe.begin(),fringe.end(),[](const Node& a, const Node& b) { 
+            data.erase(it);     //Deleting the expanded node, to prevent loops
+            std::sort(fringe.begin(),fringe.end(),[](const Node& a, const Node& b) {  //sorting the fringe after each expansion
                 return a.cumulative_cost < b.cumulative_cost;
             });
         }
