@@ -7,6 +7,7 @@
 
 struct node {
     std::vector<std::string> route;
+    std::vector<int> costs;
     std::string city_name;
     int depth;
     int cumulative_cost;
@@ -66,7 +67,9 @@ void uninformed_search(std::string input_file, std::string origin_city, std::str
     temp.city_name = origin_city;
     //temp.parent_city = "\0";
     std::vector<std::string> r;
+    std::vector<int> c;
     temp.route = r;
+    temp.costs = c;
     temp.depth = 0;
     temp.cumulative_cost = 0;
     fringe.push_back(temp);
@@ -85,13 +88,13 @@ void uninformed_search(std::string input_file, std::string origin_city, std::str
             std::cout<<"\nNodes Expanded  = "<<nodes_expanded;
             std::cout<<"\nNodes Generated = "<<nodes_generated;
             std::cout<<"\nMax   Nodes     = "<<max_nodes;
-            std::cout<<"\nDistance        = "<<current_node.cumulative_cost;
+            std::cout<<"\nDistance        = "<<current_node.cumulative_cost<<" km";
             std::cout<<"\nRoute: \n";
             int i;
             for(i = 0; i<current_node.route.size()-1;i++) {
-                std::cout<<current_node.route[i]<<" to "<<current_node.route[i+1]<<std::endl;
+                std::cout<<current_node.route[i]<<" to "<<current_node.route[i+1]<<", "<<current_node.costs[i]<<" km"<<std::endl;
             }
-            std::cout<<current_node.route[i]<<" to "<<destination_city<<std::endl;
+            std::cout<<current_node.route[i]<<" to "<<destination_city<<", "<<current_node.costs[i]<<" km"<<std::endl;
             return;
         }
 
@@ -104,6 +107,9 @@ void uninformed_search(std::string input_file, std::string origin_city, std::str
                 r = current_node.route;                 //r is already initialized before as a vector of strings, I am just using the variable again.
                 r.push_back(current_node.city_name);
                 temp.route = r;
+                c = current_node.costs;
+                c.push_back(t.second);
+                temp.costs = c;
                 temp.cumulative_cost = current_node.cumulative_cost + t.second;
                 temp.depth = current_node.depth + 1;
                 fringe.push_back(temp);
