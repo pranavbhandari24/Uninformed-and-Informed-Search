@@ -101,6 +101,7 @@ void uninformed_search(std::string input_file, std::string origin_city, std::str
     int nodes_expanded = 0, nodes_generated = 0, max_nodes = 1;
     while(!fringe.empty()) {
         // Updating max_nodes if current size is greater than max_nodes
+        nodes_expanded++;
         if(fringe.size() > max_nodes)
             max_nodes = fringe.size();
         
@@ -124,8 +125,8 @@ void uninformed_search(std::string input_file, std::string origin_city, std::str
 
         // Find the node in the data read from the file, and expand the node
         auto it = data.find(current_node.city_name);
+        
         if(it!=data.end()) {
-            nodes_expanded++;
             //Loop over all the adjacent cities and add them to fringe
             for(auto t: it->second) {
                 nodes_generated++;
@@ -181,6 +182,7 @@ void informed_search(std::string input_file, std::string origin_city, std::strin
     int nodes_expanded = 0, nodes_generated = 0, max_nodes = 1;
     while(!fringe.empty()) {
         // Updating max_nodes if current size is greater than max_nodes
+        nodes_expanded++;
         if(fringe.size() > max_nodes)
             max_nodes = fringe.size();
         
@@ -204,8 +206,8 @@ void informed_search(std::string input_file, std::string origin_city, std::strin
 
         // Find the node in the data read from the file, and expand the node
         auto it = data.find(current_node.city_name);
+        
         if(it!=data.end()) {
-            nodes_expanded++;
             //Loop over all the adjacent cities and add them to fringe
             for(auto t: it->second) {
                 nodes_generated++;
