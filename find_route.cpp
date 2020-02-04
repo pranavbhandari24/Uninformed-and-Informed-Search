@@ -14,6 +14,7 @@ class Node {
     std::string city_name;
     int depth;
     int cumulative_cost;
+    int f_n;                            // This value is only used in informed (A*) Search
 };
 
 
@@ -156,6 +157,79 @@ void uninformed_search(std::string input_file, std::string origin_city, std::str
 void informed_search(std::string input_file, std::string origin_city, std::string destination_city, std::string heuristic_file) {
     std::map<std::string, std::map<std::string, int>> data =  read_file(input_file);
     std::map<std::string, int> heuristic_data = heuristic_read_file(heuristic_file);
+
+    std::deque<Node> fringe;
+
+    //Creating the start node
+    Node temp;
+    temp.city_name = origin_city;
+    std::vector<std::string> r;
+    std::vector<int> c;
+    temp.route = r;
+    temp.costs = c;
+    temp.depth = 0;
+    temp.cumulative_cost = 0;
+    temp.f_n = 0;
+    //Adding the start node to the fringe
+    fringe.push_back(temp);
+
+    // Variables needed
+    int nodes_expanded = 0, nodes_generated = 0, max_nodes = 1;
+    while(!fringe.empty()) {
+        // Updating max_nodes if current size is greater than max_nodes
+        if(fringe.size() > max_nodes)
+            max_nodes = fringe.size();
+        
+        Node current_node = fringe[0];
+        fringe.pop_front();
+        
+        // If the destination is found, print required details
+        if(current_node.city_name == destination_city) {
+            std::cout<<"\nNodes Expanded  = "<<nodes_expanded;
+            std::cout<<"\nNodes Generated = "<<nodes_generated;
+            std::cout<<"\nMax   Nodes     = "<<max_nodes;
+            std::cout<<"\nDistance        = "<<current_node.cumulative_cost<<" km";
+            std::cout<<"\nRoute: \n";
+            int i;
+            for(i = 0; i<current_node.route.size()-1;i++) {
+                std::cout<<current_node.route[i]<<" to "<<current_node.route[i+1]<<", "<<current_node.costs[i]<<" km"<<std::endl;
+            }
+            std::cout<<current_node.route[i]<<" to "<<destination_city<<", "<<current_node.costs[i]<<" km"<<std::endl;
+            return;
+        }
+
+        // Find the node in the data read from the file, and expand the node
+        auto it = data.find(current_node.city_name);
+        if(it!=data.end()) {
+            nodes_expanded++;
+            //Loop over all the adjacent cities and add them to fringe
+            for(auto t: it->second) {
+                nodes_generated++;
+                temp.city_name = t.first;               //temp is already initialized before as a struct node, I am just using the variable again.
+                r = current_node.route;                 //r is already initialized before as a vector of strings, I am just using the variable again.
+                r.push_back(current_node.city_name);
+                temp.route = r;
+                c = current_node.costs;
+                c.push_back(t.second);
+                temp.costs = c;
+                temp.cumulative_cost = current_node.cumulative_cost + t.second;
+                temp.depth = current_node.depth + 1;
+                //std::string cost = 
+                temp.f_n = current_node.f_n + heuristic_data.find(t.first)->second;
+                fringe.push_back(temp);
+            }
+            data.erase(it);     //Deleting the expanded node, to prevent loops
+            std::sort(fringe.begin(),fringe.end(),[](const Node& a, const Node& b) {  //sorting the fringe after each expansion
+                return a.f_n < b.f_n;
+            });
+        }
+    }  
+    //Node not found
+    std::cout<<"\nNodes Expanded  = "<<nodes_expanded;
+    std::cout<<"\nNodes Generated = "<<nodes_generated;
+    std::cout<<"\nMax   Nodes     = "<<max_nodes;
+    std::cout<<"\nDistance        = infinity";
+    std::cout<<"\nRoute: \nnone\n";
 }
 
 int main(int argc, char* argv[]) {
