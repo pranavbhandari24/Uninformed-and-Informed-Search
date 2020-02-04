@@ -155,6 +155,10 @@ void uninformed_search(std::string input_file, std::string origin_city, std::str
 }
 
 void informed_search(std::string input_file, std::string origin_city, std::string destination_city, std::string heuristic_file) {
+    // Informed Search is implemented using A* Search,
+    // The same class Node is used, which is used in Uninformed Search, 
+    // but with an additional variable called f_n, which is the f(n) value for the particular node
+    // The code is basically the same except that, the fringe is now sorted according to the f(n) value
     std::map<std::string, std::map<std::string, int>> data =  read_file(input_file);
     std::map<std::string, int> heuristic_data = heuristic_read_file(heuristic_file);
 
@@ -182,7 +186,7 @@ void informed_search(std::string input_file, std::string origin_city, std::strin
         
         Node current_node = fringe[0];
         fringe.pop_front();
-        
+
         // If the destination is found, print required details
         if(current_node.city_name == destination_city) {
             std::cout<<"\nNodes Expanded  = "<<nodes_expanded;
@@ -214,8 +218,7 @@ void informed_search(std::string input_file, std::string origin_city, std::strin
                 temp.costs = c;
                 temp.cumulative_cost = current_node.cumulative_cost + t.second;
                 temp.depth = current_node.depth + 1;
-                //std::string cost = 
-                temp.f_n = current_node.f_n + heuristic_data.find(t.first)->second;
+                temp.f_n = temp.cumulative_cost + heuristic_data.find(t.first)->second;
                 fringe.push_back(temp);
             }
             data.erase(it);     //Deleting the expanded node, to prevent loops
