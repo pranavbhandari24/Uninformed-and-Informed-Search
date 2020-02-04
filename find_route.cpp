@@ -141,7 +141,7 @@ void uninformed_search(std::string input_file, std::string origin_city, std::str
                 temp.depth = current_node.depth + 1;
                 fringe.push_back(temp);
             }
-            data.erase(it);     //Deleting the expanded node, to prevent loops
+            data.erase(it);     //Deleting the expanded node, to make sure next time it produces no successors
             std::sort(fringe.begin(),fringe.end(),[](const Node& a, const Node& b) {  //sorting the fringe after each expansion
                 return a.cumulative_cost < b.cumulative_cost;
             });
