@@ -1,3 +1,7 @@
+/*
+    Pranav Bhandari
+*/
+
 #include <iostream>
 #include <fstream>
 #include <map>
@@ -110,11 +114,11 @@ void uninformed_search(std::string input_file, std::string origin_city, std::str
         
         // If the destination is found, print required details
         if(current_node.city_name == destination_city) {
-            std::cout<<"\nNodes Expanded  = "<<nodes_expanded;
-            std::cout<<"\nNodes Generated = "<<nodes_generated;
-            std::cout<<"\nMax   Nodes     = "<<max_nodes;
-            std::cout<<"\nDistance        = "<<current_node.cumulative_cost<<" km";
-            std::cout<<"\nRoute: \n";
+            std::cout<<"\nnodes expanded: "<<nodes_expanded;
+            std::cout<<"\nnodes generated: "<<nodes_generated;
+            std::cout<<"\nmax nodes in memory: "<<max_nodes;
+            std::cout<<"\ndistance: "<<current_node.cumulative_cost<<" km";
+            std::cout<<"\nroute: \n";
             int i;
             for(i = 0; i<current_node.route.size()-1;i++) {
                 std::cout<<current_node.route[i]<<" to "<<current_node.route[i+1]<<", "<<current_node.costs[i]<<" km"<<std::endl;
@@ -142,17 +146,18 @@ void uninformed_search(std::string input_file, std::string origin_city, std::str
                 fringe.push_back(temp);
             }
             data.erase(it);     //Deleting the expanded node, to make sure next time it produces no successors
+                                //That makes this algorithm a graph search
             std::sort(fringe.begin(),fringe.end(),[](const Node& a, const Node& b) {  //sorting the fringe after each expansion
                 return a.cumulative_cost < b.cumulative_cost;
             });
         }
     }
     //Node not found
-    std::cout<<"\nNodes Expanded  = "<<nodes_expanded;
-    std::cout<<"\nNodes Generated = "<<nodes_generated;
-    std::cout<<"\nMax   Nodes     = "<<max_nodes;
-    std::cout<<"\nDistance        = infinity";
-    std::cout<<"\nRoute: \nnone\n";
+    std::cout<<"\nnodes expanded: "<<nodes_expanded;
+    std::cout<<"\nnodes generated: "<<nodes_generated;
+    std::cout<<"\nmax nodes in memory: "<<max_nodes;
+    std::cout<<"\ndistance: infinity";
+    std::cout<<"\nroute: \nnone\n";
 }
 
 void informed_search(std::string input_file, std::string origin_city, std::string destination_city, std::string heuristic_file) {
@@ -191,11 +196,11 @@ void informed_search(std::string input_file, std::string origin_city, std::strin
 
         // If the destination is found, print required details
         if(current_node.city_name == destination_city) {
-            std::cout<<"\nNodes Expanded  = "<<nodes_expanded;
-            std::cout<<"\nNodes Generated = "<<nodes_generated;
-            std::cout<<"\nMax   Nodes     = "<<max_nodes;
-            std::cout<<"\nDistance        = "<<current_node.cumulative_cost<<" km";
-            std::cout<<"\nRoute: \n";
+            std::cout<<"\nnodes expanded: "<<nodes_expanded;
+            std::cout<<"\nnodes generated: "<<nodes_generated;
+            std::cout<<"\nmax nodes in memory: "<<max_nodes;
+            std::cout<<"\ndistance:"<<current_node.cumulative_cost<<" km";
+            std::cout<<"\nroute: \n";
             int i;
             for(i = 0; i<current_node.route.size()-1;i++) {
                 std::cout<<current_node.route[i]<<" to "<<current_node.route[i+1]<<", "<<current_node.costs[i]<<" km"<<std::endl;
@@ -230,11 +235,11 @@ void informed_search(std::string input_file, std::string origin_city, std::strin
         }
     }  
     //Node not found
-    std::cout<<"\nNodes Expanded  = "<<nodes_expanded;
-    std::cout<<"\nNodes Generated = "<<nodes_generated;
-    std::cout<<"\nMax   Nodes     = "<<max_nodes;
-    std::cout<<"\nDistance        = infinity";
-    std::cout<<"\nRoute: \nnone\n";
+    std::cout<<"\nnodes expanded: "<<nodes_expanded;
+    std::cout<<"\nnodes generated: "<<nodes_generated;
+    std::cout<<"\nmax nodes in memory: "<<max_nodes;
+    std::cout<<"\ndistance: infinity";
+    std::cout<<"\nroute: \nnone\n";
 }
 
 int main(int argc, char* argv[]) {
