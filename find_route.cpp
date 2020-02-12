@@ -9,16 +9,17 @@
 #include <vector>
 #include <deque>
 #include <algorithm>
+#include <iomanip>
 
 //Used class, as I might need extra functionality
 class Node {
     public:
     std::vector<std::string> route;
-    std::vector<int> costs;
+    std::vector<double> costs;
     std::string city_name;
     int depth;
-    int cumulative_cost;
-    int f_n;                            // This value is only used in informed (A*) Search
+    double cumulative_cost;
+    double f_n;                            // This value is only used in informed (A*) Search
 };
 
 
@@ -33,8 +34,8 @@ std::vector<std::string> tokenize(std::string text) {
     return result;
 }
 
-std::map<std::string, std::map<std::string, int>> read_file(std::string input_file) {
-    std::map<std::string, std::map<std::string, int>> data;
+std::map<std::string, std::map<std::string, double>> read_file(std::string input_file) {
+    std::map<std::string, std::map<std::string, double>> data;
     std::fstream file(input_file);
     std::string text;
     while(getline(file, text)) {
@@ -42,25 +43,25 @@ std::map<std::string, std::map<std::string, int>> read_file(std::string input_fi
             break;
         else {
             std::vector<std::string> line = tokenize(text);
-            int cost = std::stoi(line[2]);
+            double cost = std::stod(line[2]);
             auto start = data.find(line[0]);
             auto end   = data.find(line[1]);
             if(start == data.end()) {
-                std::map<std::string, int> temp;
+                std::map<std::string, double> temp;
                 temp[line[1]] = cost;
-                data.insert( std::pair<std::string, std::map<std::string, int>>(line[0], temp) );
+                data.insert( std::pair<std::string, std::map<std::string, double>>(line[0], temp) );
             }
             else {
-                (data.find(line[0])->second).insert(std::pair<std::string, int>(line[1], cost));
+                (start->second).insert(std::pair<std::string, double>(line[1], cost));
             }
 
             if(end == data.end()) {
-                std::map<std::string, int> temp;
+                std::map<std::string, double> temp;
                 temp[line[0]] = cost;
-                data.insert( std::pair<std::string, std::map<std::string, int>>(line[1], temp) );
+                data.insert( std::pair<std::string, std::map<std::string, double>>(line[1], temp) );
             }
             else {
-                (data.find(line[1])->second).insert(std::pair<std::string, int>(line[0], cost));
+                (end->second).insert(std::pair<std::string, double>(line[0], cost));
             }
         }
     }
@@ -68,15 +69,15 @@ std::map<std::string, std::map<std::string, int>> read_file(std::string input_fi
     return data;
 }
 
-std::map<std::string, int> heuristic_read_file(std::string heuristic_file) {
+std::map<std::string, double> heuristic_read_file(std::string heuristic_file) {
     std::fstream file(heuristic_file);
     std::string text;
-    std::map<std::string, int> result;
+    std::map<std::string, double> result;
     while(getline(file,text)) {
         if(text == "END OF INPUT") 
             break;
         std::vector<std::string> words = tokenize(text);
-        result[words[0]] = std::stoi(words[1]);
+        result[words[0]] = std::stod(words[1]);
     }
     return result;
 }
@@ -86,18 +87,18 @@ void uninformed_search(std::string input_file, std::string origin_city, std::str
     // The algorithm starts at the origin city and searches breadth first, 
     // Already expanded nodes are deleted, to avoid loops
     // Fringe is sorted after each expansion to guarantee optimal solution.
-    std::map<std::string, std::map<std::string, int>> data = read_file(input_file);
+    std::map<std::string, std::map<std::string, double>> data = read_file(input_file);
     std::deque<Node> fringe;
 
     //Creating the start node
     Node temp;
     temp.city_name = origin_city;
     std::vector<std::string> r;
-    std::vector<int> c;
+    std::vector<double> c;
     temp.route = r;
     temp.costs = c;
     temp.depth = 0;
-    temp.cumulative_cost = 0;
+    temp.cumulative_cost = 0.0;
     //Adding the start node to the fringe
     fringe.push_back(temp);
 
@@ -117,13 +118,13 @@ void uninformed_search(std::string input_file, std::string origin_city, std::str
             std::cout<<"\nnodes expanded: "<<nodes_expanded;
             std::cout<<"\nnodes generated: "<<nodes_generated;
             std::cout<<"\nmax nodes in memory: "<<max_nodes;
-            std::cout<<"\ndistance: "<<current_node.cumulative_cost<<" km";
+            std::cout<<"\ndistance: "<<std::fixed<<std::setprecision(1)<<current_node.cumulative_cost<<" km";
             std::cout<<"\nroute: \n";
             int i;
             for(i = 0; i<current_node.route.size()-1;i++) {
-                std::cout<<current_node.route[i]<<" to "<<current_node.route[i+1]<<", "<<current_node.costs[i]<<" km"<<std::endl;
+                std::cout<<current_node.route[i]<<" to "<<current_node.route[i+1]<<", "<<std::fixed<<std::setprecision(1)<<current_node.costs[i]<<" km"<<std::endl;
             }
-            std::cout<<current_node.route[i]<<" to "<<destination_city<<", "<<current_node.costs[i]<<" km"<<std::endl;
+            std::cout<<current_node.route[i]<<" to "<<destination_city<<", "<<std::fixed<<std::setprecision(1)<<current_node.costs[i]<<" km"<<std::endl;
             return;
         }
 
@@ -165,8 +166,8 @@ void informed_search(std::string input_file, std::string origin_city, std::strin
     // The same class Node is used, which is used in Uninformed Search, 
     // but with an additional variable called f_n, which is the f(n) value for the particular node
     // The code is basically the same except that, the fringe is now sorted according to the f(n) value
-    std::map<std::string, std::map<std::string, int>> data =  read_file(input_file);
-    std::map<std::string, int> heuristic_data = heuristic_read_file(heuristic_file);
+    std::map<std::string, std::map<std::string, double>> data =  read_file(input_file);
+    std::map<std::string, double> heuristic_data = heuristic_read_file(heuristic_file);
 
     std::deque<Node> fringe;
 
@@ -174,12 +175,12 @@ void informed_search(std::string input_file, std::string origin_city, std::strin
     Node temp;
     temp.city_name = origin_city;
     std::vector<std::string> r;
-    std::vector<int> c;
+    std::vector<double> c;
     temp.route = r;
     temp.costs = c;
     temp.depth = 0;
-    temp.cumulative_cost = 0;
-    temp.f_n = 0;
+    temp.cumulative_cost = 0.0;
+    temp.f_n = 0.0;
     //Adding the start node to the fringe
     fringe.push_back(temp);
 
@@ -199,13 +200,13 @@ void informed_search(std::string input_file, std::string origin_city, std::strin
             std::cout<<"\nnodes expanded: "<<nodes_expanded;
             std::cout<<"\nnodes generated: "<<nodes_generated;
             std::cout<<"\nmax nodes in memory: "<<max_nodes;
-            std::cout<<"\ndistance:"<<current_node.cumulative_cost<<" km";
+            std::cout<<"\ndistance:"<<std::fixed<<std::setprecision(1)<<current_node.cumulative_cost<<" km";
             std::cout<<"\nroute: \n";
             int i;
             for(i = 0; i<current_node.route.size()-1;i++) {
-                std::cout<<current_node.route[i]<<" to "<<current_node.route[i+1]<<", "<<current_node.costs[i]<<" km"<<std::endl;
+                std::cout<<current_node.route[i]<<" to "<<current_node.route[i+1]<<", "<<std::fixed<<std::setprecision(1)<<current_node.costs[i]<<" km"<<std::endl;
             }
-            std::cout<<current_node.route[i]<<" to "<<destination_city<<", "<<current_node.costs[i]<<" km"<<std::endl;
+            std::cout<<current_node.route[i]<<" to "<<destination_city<<", "<<std::fixed<<std::setprecision(1)<<current_node.costs[i]<<" km"<<std::endl;
             return;
         }
 
